@@ -1,30 +1,36 @@
+using NUnit.Framework;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class RecipeManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
+   string recipeName = "Pancakes";
+    int currentStep = 0;
+    List<IngredientType> recipeSteps;
+
+    void LoadRecipe() //Laddar ett nytt recept
+    { 
+    
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    bool ValidateIngredient (Ingredient ingredient) //Kontrollerar om ingrediens är rätt
+    { 
+        return ingredient.type == recipeSteps[currentStep];
     }
 
-    string recipeName()
-    {
-        return "Pancakes";
+    void NextStep() //Går vidare till nästa ingrediens
+    { 
+        currentStep++;
     }
 
-    int currentStep()
-    {
-        return 1;
+    bool IsRecipeComplete() //Returnerar true när receptet är klart
+    { 
+        return currentStep >= recipeSteps.Count;
     }
-     string[] recipeSteps()
-     {
-         return new string[] {"Add flour", "Add eggs", "Add milk", "Mix ingredients", "Cook on pan"};
+
+    IngredientType GetCurrentIngredient() //Visar vad som förväntas härnäst
+    { 
+        return recipeSteps[currentStep];
     }
+
 }

@@ -2,30 +2,49 @@ using UnityEngine;
 
 public class PanController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    float tiltAngle = 15f;
+    float maxTilt= 30f; // Maximum tilt angle in degrees
+
+    int stackCount = 0;
+    Vector2 position;
+
+
+    void UpdateTilt(float input) //Uppdaterar lutning baserat på spelarinput
     {
-        
+        tiltAngle += input;
+        tiltAngle = Mathf.Clamp(tiltAngle, -maxTilt, maxTilt);
+        transform.rotation = Quaternion.Euler(tiltAngle, 0, 0);
     }
 
-    // Update is called once per frame
-    void Update()
+    bool CheckBalance() //Kontrollerar om ingredienser riskerar ramla av
     {
-        
+        return stackCount < 5; // Example condition for balance
+    }
+     void OnTriggerEnter(Collider other)
+     {
+         if (other.CompareTag("FallingObject"))
+         {
+             stackCount++;
+             Destroy(other.gameObject);
+         }
     }
 
-    int tiltAngle()
+    void CatchIngredient(object fallingObject) //Hanterar när en ingrediens fångas
     {
-        return (int)transform.rotation.eulerAngles.z;
+        stackCount++;
+        // Additional logic to handle the caught ingredient
     }
 
-    int maxTiltAngle()
+    void DropStack() //Tömmer stacken om balansen förloras
     {
-        return 30;
+        stackCount = 0;
+        // Additional logic to handle dropping the stack
     }
 
-    int stackCount()
+    bool IsInSafeZone() //Kontrollerar om pannan är i safe space vid start
     {
-        return transform.childCount;
+        return position.x > -5 && position.x < 5; // Example safe zone condition
     }
+
 }

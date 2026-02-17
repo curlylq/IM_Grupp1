@@ -2,20 +2,23 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    int lives = 3;
+
+  
+
+    void loseLife() // Tar bort ett liv när fel ingrediens fångas
     {
-        
+        lives--;
     }
 
-    // Update is called once per frame
-    void Update()
+    bool isAlive() // Returnerar om spelaren har liv kvar
     {
-        
+        return lives > 0;
     }
 
-    int lives()
+    void ResetLives() //Återställer till 3 liv vid ny omgång
     {
-        return 3;
+        lives = 3;
     }
 }

@@ -1,26 +1,83 @@
 using UnityEngine;
+using UnityEngine.Android;
+using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.XR;
 
 public class GameManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    
+
+    public static GameManager Instance;
+
+    public GameState state = GameState.WaitingToStart;
+
+    public int lives = 3;
+    public int score = 0;
+
+    public float fallSpeedMultiplier = 1.0f;
+    public float difficultyIncreaseRate = 0.05f;
+
+
+    public float safeSpaceDuration = 3.0f; // Duration in seconds for the safe space at the start of the game
+    private float safeSpaceTimer; 
+
+
+
+    private void Awake() // Singleton pattern för att säkerställa en enda instans av GameManager
     {
-        
+        Instance = this;
     }
 
-    // Update is called once per frame
-    void Update()
+
+   
+
+   
+
+    
+    private void Update() //Huvudloop som uppdaterar alla komponenter
     {
-        
+        if (state == GameState.WaitingToStart)
+        {
+            if (Player.Instance.IsHoldingStartArea())
+                StartGame();
+        }
+
+        if (state == GameState.Playing)
+        {
+            fallSpeedMultiplier += difficultyIncreaseRate * Time.deltaTime;
+        }
     }
 
-    int score ()
+    void StartGame() // Initierar spelet, visar startområdet
     {
-        return 0;
+        state = GameState.Playing;
+        safeSpaceTimer = safeSpaceDuration;
     }
 
-    int difficultyLevel ()
+    public bool IsSafeSpaceActive() //Kontrollerar om safe space är aktivt
     {
-        return 0;
+        return safeSpaceTimer > 0f;
     }
+
+   public void LoseLife() // Hanterar när spelaren förlorar ett liv
+    {
+        lives--;
+        if (lives <= 0)
+        {
+            GameOver();
+        }
+    }
+
+    public void AddScore (int amount) //Lägger till poäng när rätt ingrediens fångas
+    {
+        score += amount;
+    }
+
+    void GameOver() // Hanterar spelets
+    {
+        state = GameState.GameOver;
+    }
+
+
+
 }
