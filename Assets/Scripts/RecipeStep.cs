@@ -4,10 +4,10 @@ public class RecipeStep : MonoBehaviour
 {
 
     private int order;
-    private IngredientType IngredientType { get; }
+    private Enums.IngredientType IngredientType { get; }
 
 
-  public RecipeStep(int order, IngredientType ingredientType)
+  public RecipeStep(int order, Enums.IngredientType ingredientType)
     {
         this.order = order;
         this.IngredientType = ingredientType;

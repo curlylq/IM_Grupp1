@@ -47,7 +47,7 @@ public class PanCatchZone : MonoBehaviour
             if (rb == null) { stableTimers.Remove(obj); continue; }
 
             bool slowEnough =
-                rb.velocity.magnitude <= maxStableSpeed &&
+                rb.linearVelocity.magnitude <= maxStableSpeed &&
                 rb.angularVelocity.magnitude <= maxStableAngularSpeed;
 
             if (slowEnough)
