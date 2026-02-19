@@ -1,36 +1,56 @@
 using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Enums;
 
 public class RecipeManager : MonoBehaviour
 {
-   string recipeName = "Pancakes";
-    int currentStep = 0;
-    List<IngredientType> recipeSteps;
 
-    void LoadRecipe() //Laddar ett nytt recept
-    { 
+    private Recipe activeRecipe;
+    private int stepIndex;
     
+    
+
+    public void NewRecipe( Recipe recipe) //Laddar ett nytt recept
+    { 
+        activeRecipe = recipe;
+        stepIndex = 0;
     }
 
-    bool ValidateIngredient (Ingredient ingredient) //Kontrollerar om ingrediens är rätt
-    { 
-        return ingredient.type == recipeSteps[currentStep];
+    public IngredientType? GetExpectedIngredient() //Visar vad som förväntas härnäst
+    {
+        if (activeRecipe == null) return null;
+
+        var step = activeRecipe.GetStep(stepIndex);
+        return step?.IngredientType;
     }
 
-    void NextStep() //Går vidare till nästa ingrediens
+    public CatchResult ValidateCatch (Ingredient ingredient) //Kontrollerar om ingrediens är rätt
     { 
-        currentStep++;
+        if (activeRecipe == null) return CatchResult.NoActiveRecipe;
+
+        var expected = GetExpectedIngredient();
+
+        if (expected == null) return CatchResult.RecipeComplete;
+
+        if (ingredient.Type == expected) 
+        {
+            stepIndex++;
+            return CatchResult.Correct;
+        }
+        return CatchResult.Wrong;
+
     }
 
-    bool IsRecipeComplete() //Returnerar true när receptet är klart
+ 
+
+    public bool IsRecipeComplete() //Returnerar true när receptet är klart
     { 
-        return currentStep >= recipeSteps.Count;
+        if (activeRecipe == null) return false;
+
+        return stepIndex >= activeRecipe.Steps.Count;
     }
 
-    IngredientType GetCurrentIngredient() //Visar vad som förväntas härnäst
-    { 
-        return recipeSteps[currentStep];
-    }
+ 
 
 }

@@ -24,4 +24,12 @@ public class Enums : MonoBehaviour
         ExtraInstability
     }
 
+    public enum CatchResult
+    {
+        Correct,
+        Wrong,
+        NoActiveRecipe,
+        RecipeComplete
+    }
+
 }
