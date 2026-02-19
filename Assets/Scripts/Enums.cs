@@ -4,7 +4,8 @@ public class Enums : MonoBehaviour
 {
     public enum GameState
     {
-        WaitingToStart,
+        Idle,
+        Starting,
         Playing,
         GameOver
     }
