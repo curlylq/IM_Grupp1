@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private DifficultyManager difficultyManager;
     [SerializeField] private Spawner spawner;
     [SerializeField] private PanController panController;
-    [SerializeField] private FeedbackManager feedbackManager;
+    // [SerializeField] private FeedbackManager feedbackManager;
     
     public GameState State => state;
     public float CurrentSpeedMultiplier => currentSpeedMultiplier;
@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
         // Spawner: säker zon aktiv i början (om du har sådan logik)
         // spawner.ActivateSafeZone();
 
-        feedbackManager?.PlayNewRecipe();
+        //feedbackManager?.PlayNewRecipe();
     }
 
     public void EndGame() // Hanterar spelets
@@ -91,7 +91,7 @@ public class GameManager : MonoBehaviour
         // spawner.Stop();
 
         // Feedback
-        feedbackManager?.PlayWrong(); // eller en egen PlayGameOver()
+        //feedbackManager?.PlayWrong(); // eller en egen PlayGameOver()
     }
 
     private void TickPlaying(float dt)
@@ -151,22 +151,22 @@ public class GameManager : MonoBehaviour
             case CatchResult.Correct:
                 comboTracker?.OnCorrectCatch();
                 scoreSystem?.AddPoints(comboTracker != null ? comboTracker.GetMultiplier() : 1f);
-                feedbackManager?.PlayWrong(); // byt till "correct"-ljud om du har det
-                feedbackManager?.UpdatePanGlow(0f, 1f); // ex: grönt glow (beroende på din impl)
+                //feedbackManager?.PlayWrong(); // byt till "correct"-ljud om du har det
+                //feedbackManager?.UpdatePanGlow(0f, 1f); // ex: grönt glow (beroende på din impl)
                 break;
 
             case CatchResult.WrongOrder:
                 comboTracker?.OnMistake();
                 lifeSystem?.LoseLife();
-                feedbackManager?.PlayWrong();
-                feedbackManager?.UpdatePanGlow(0f, 0f);
+                //feedbackManager?.PlayWrong();
+                //feedbackManager?.UpdatePanGlow(0f, 0f);
                 break;
 
             case CatchResult.NotInRecipe:
                 comboTracker?.OnMistake();
                 lifeSystem?.LoseLife();
-                feedbackManager?.PlayWrong();
-                feedbackManager?.UpdatePanGlow(0f, 0f);
+                //feedbackManager?.PlayWrong();
+                //feedbackManager?.UpdatePanGlow(0f, 0f);
                 break;
         }
 
@@ -174,8 +174,8 @@ public class GameManager : MonoBehaviour
         {
             scoreSystem?.AddRecipeBonus();
             difficultyManager?.IncreaseDifficulty();
-            feedbackManager?.PlayRecipeComplete();
-            feedbackManager?.PlayNewRecipe();
+            //feedbackManager?.PlayRecipeComplete();
+            //feedbackManager?.PlayNewRecipe();
 
             // Ladda nästa recept (beror på hur du väljer recept)
             // recipeManager.NewRecipe();
@@ -189,8 +189,8 @@ public class GameManager : MonoBehaviour
     {
         comboTracker?.OnMistake();
         lifeSystem?.LoseLife();
-        feedbackManager?.PlayWrong();
-        feedbackManager?.UpdatePanGlow(0f, 0f);
+        //feedbackManager?.PlayWrong();
+        //feedbackManager?.UpdatePanGlow(0f, 0f);
 
         if (lifeSystem != null && lifeSystem.IsDead())
             EndGame();
@@ -200,7 +200,7 @@ public class GameManager : MonoBehaviour
     {
         comboTracker?.OnMistake();
         lifeSystem?.LoseLife();
-        feedbackManager?.PlayWrong();
+        //feedbackManager?.PlayWrong();
 
         if (lifeSystem != null && lifeSystem.IsDead())
             EndGame();

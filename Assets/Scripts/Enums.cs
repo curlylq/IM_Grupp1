@@ -28,7 +28,8 @@ public class Enums : MonoBehaviour
     public enum CatchResult
     {
         Correct,
-        Wrong,
+        WrongOrder,
+        NotInRecipe,
         NoActiveRecipe,
         RecipeComplete
     }
