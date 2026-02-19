@@ -110,13 +110,11 @@ public class GameManager : MonoBehaviour
             EndGame();
     }
 
-    public FallingObject OnObjectCought (FallingObject obj)
+    public void OnObjectCought(FallingObject obj)
     {
         if (state != GameState.Playing || obj == null)
             return;
 
-        // Avgör vad som fångats (Ingredient / WrongObject / SpecialObject)
-        // UML visar att Ingredient och WrongObject är FallingObject-subklasser.
         if (obj is Ingredient ingredient)
         {
             HandleIngredientCaught(ingredient);
@@ -131,15 +129,13 @@ public class GameManager : MonoBehaviour
 
         if (obj is SpecialObject special)
         {
-            // SpecialObject: +ApplyEffect(gm: GameManager) i UML
             special.ApplyEffect(this);
-            // samt +RemoveEffect(gm: GameManager) när duration går ut (sköts i SpecialObject)
             return;
         }
 
-        // Okänd typ -> behandla som fel
         HandleGenericWrong();
     }
+
 
     private void HandleIngredientCaught(Ingredient ingredient)
     {
@@ -150,7 +146,7 @@ public class GameManager : MonoBehaviour
         {
             case CatchResult.Correct:
                 comboTracker?.OnCorrectCatch();
-                scoreSystem?.AddPoints(comboTracker != null ? comboTracker.GetMultiplier() : 1f);
+                scoreSystem?.AddPoints(Mathf.RoundToInt(comboTracker != null ? comboTracker.GetMultiplier() : 1f));
                 //feedbackManager?.PlayWrong(); // byt till "correct"-ljud om du har det
                 //feedbackManager?.UpdatePanGlow(0f, 1f); // ex: grönt glow (beroende på din impl)
                 break;
