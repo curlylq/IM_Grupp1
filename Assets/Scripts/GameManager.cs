@@ -1,17 +1,19 @@
+﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Android;
-using UnityEngine.SocialPlatforms.Impl;
-using UnityEngine.XR;
 using static Enums;
 
 public class GameManager : MonoBehaviour
 {
+    // ── Singleton ────────────────────────────────────────────────────
+    public static GameManager Instance { get; private set; }
 
+    // ── State ────────────────────────────────────────────────────────
     [Header("State")]
     [SerializeField] private GameState state = GameState.Idle;
     [SerializeField] private float currentSpeedMultiplier = 1f;
 
-    [Header("System (wire in Inspector")]
+    // ── System-referenser (koppla i Inspector) ───────────────────────
+    [Header("Systems (wire in Inspector)")]
     [SerializeField] private RecipeManager recipeManager;
     [SerializeField] private ScoreSystem scoreSystem;
     [SerializeField] private ComboTracker comboTracker;
@@ -20,15 +22,25 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Spawner spawner;
     [SerializeField] private PanController panController;
     // [SerializeField] private FeedbackManager feedbackManager;
-    
+
+    // ── Publika egenskaper ───────────────────────────────────────────
     public GameState State => state;
     public float CurrentSpeedMultiplier => currentSpeedMultiplier;
 
+    // ────────────────────────────────────────────────────────────────
+    // Unity-livscykel
+    // ────────────────────────────────────────────────────────────────
 
     private void Awake()
     {
+        // Singleton-setup: förstör duplicat om det finns
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
 
-        //Rimlig deafault
         state = GameState.Idle;
         currentSpeedMultiplier = 1f;
     }
@@ -38,19 +50,21 @@ public class GameManager : MonoBehaviour
         Update(Time.deltaTime);
     }
 
-    // UML: +Update(dt: float)
+    // ────────────────────────────────────────────────────────────────
+    // Spelstyrning
+    // ────────────────────────────────────────────────────────────────
+
     public void Update(float dt)
     {
         switch (state)
         {
             case GameState.Idle:
-                // V�ntar p� att spelaren ska starta spelet
+                // Väntar på att spelaren håller pannan i startzon
                 break;
 
             case GameState.Starting:
-                // Enkel "instant start" � kan bytas mot countdown/intro
+                // Kan bytas mot countdown/intro-animation
                 state = GameState.Playing;
-                StartGame();
                 break;
 
             case GameState.Playing:
@@ -58,58 +72,57 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.GameOver:
-                // Hanterar game over-logiken
+                // Hanteras av EndGame()
                 break;
-
         }
     }
 
-    public void StartGame() // Initierar spelet, visar startomr�det
+    /// <summary>
+    /// Anropas av StartZone när spelaren hållit pannan tillräckligt länge.
+    /// </summary>
+    public void StartGame()
     {
-        // Reset state
-        comboTracker?.OnCorrectCatch(); // om du vill nolla combo separat, g�r en Reset()-metod ist�llet
         currentSpeedMultiplier = 1f;
         state = GameState.Starting;
 
-        // Reset recept / liv / score
-        // (Exakt reset beror p� hur dina klasser ser ut, men id�n �r h�r)
-        // lifeSystem.ResetLives();
-        // scoreSystem.Reset();
-        // recipeManager.NewRecipe();
-
-        // Spawner: s�ker zon aktiv i b�rjan (om du har s�dan logik)
-        // spawner.ActivateSafeZone();
-
-        //feedbackManager?.PlayNewRecipe();
+        // Återställ subsystem
+        // lifeSystem?.ResetLives();
+        // scoreSystem?.Reset();
+        // recipeManager?.NewRecipe();
+        // spawner?.ActivateSafeZone();
+        // feedbackManager?.PlayNewRecipe();
     }
 
-    public void EndGame() // Hanterar spelets
+    /// <summary>
+    /// Avslutar spelet och sätter state till GameOver.
+    /// </summary>
+    public void EndGame()
     {
         state = GameState.GameOver;
 
-        // Stoppa spawn / effekter
-        // spawner.Stop();
-
-        // Feedback
-        //feedbackManager?.PlayWrong(); // eller en egen PlayGameOver()
+        // spawner?.Stop();
+        // feedbackManager?.PlayGameOver();
     }
 
     private void TickPlaying(float dt)
     {
-        // 1) Difficulty -> speed multiplier
+        // Uppdatera svårighetsgrad och hastighet
         if (difficultyManager != null)
             currentSpeedMultiplier = difficultyManager.GetSpawnRate();
-        // Obs: i diagrammet finns GetSpawnRate(): float och GetFallSpeed(): float.
-        // Om du vill att speed multiplier ska p�verka fall, kan du ist�llet anv�nda GetFallSpeed().
 
-        // 2) Spawner uppdateras normalt av sig sj�lv, men om du vill styra h�r:
-        // spawner.SetSpawnRate(difficultyManager.GetSpawnRate());
-
-        // 3) Game over check
+        // Kolla om spelaren är död
         if (lifeSystem != null && lifeSystem.IsDead())
             EndGame();
     }
 
+    // ────────────────────────────────────────────────────────────────
+    // Fångst-hantering
+    // ────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Huvudingång för alla fallande objekt när de fångas av pannan.
+    /// Sorterar objekttyp och delegerar till rätt handler.
+    /// </summary>
     public void OnObjectCought(FallingObject obj)
     {
         if (state != GameState.Playing || obj == null)
@@ -129,40 +142,44 @@ public class GameManager : MonoBehaviour
 
         if (obj is SpecialObject special)
         {
+            // Applicera effekten och schemalägg borttagning via GameManager
+            // så att coroutinen inte avbryts när objektet förstörs
             special.ApplyEffect(this);
+            StartCoroutine(RemoveSpecialEffectAfterDelay(special, special.Duration));
             return;
         }
 
         HandleGenericWrong();
     }
 
+    private IEnumerator RemoveSpecialEffectAfterDelay(SpecialObject special, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        special.RemoveEffect(this);
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // Privata handlers
+    // ────────────────────────────────────────────────────────────────
 
     private void HandleIngredientCaught(Ingredient ingredient)
     {
-        // Receptvalidering
         var result = recipeManager.ValidateCatch(ingredient);
 
         switch (result)
         {
             case CatchResult.Correct:
                 comboTracker?.OnCorrectCatch();
-                scoreSystem?.AddPoints(Mathf.RoundToInt(comboTracker != null ? comboTracker.GetMultiplier() : 1f));
-                //feedbackManager?.PlayWrong(); // byt till "correct"-ljud om du har det
-                //feedbackManager?.UpdatePanGlow(0f, 1f); // ex: gr�nt glow (beroende p� din impl)
+                int points = Mathf.RoundToInt(comboTracker != null ? comboTracker.GetMultiplier() : 1f);
+                scoreSystem?.AddPoints(points);
+                // feedbackManager?.PlayCorrect();
                 break;
 
             case CatchResult.WrongOrder:
-                comboTracker?.OnMistake();
-                lifeSystem?.LoseLife();
-                //feedbackManager?.PlayWrong();
-                //feedbackManager?.UpdatePanGlow(0f, 0f);
-                break;
-
             case CatchResult.NotInRecipe:
                 comboTracker?.OnMistake();
                 lifeSystem?.LoseLife();
-                //feedbackManager?.PlayWrong();
-                //feedbackManager?.UpdatePanGlow(0f, 0f);
+                // feedbackManager?.PlayWrong();
                 break;
         }
 
@@ -170,11 +187,8 @@ public class GameManager : MonoBehaviour
         {
             scoreSystem?.AddRecipeBonus();
             difficultyManager?.IncreaseDifficulty();
-            //feedbackManager?.PlayRecipeComplete();
-            //feedbackManager?.PlayNewRecipe();
-
-            // Ladda n�sta recept (beror p� hur du v�ljer recept)
-            // recipeManager.NewRecipe();
+            // feedbackManager?.PlayRecipeComplete();
+            // recipeManager?.NewRecipe();
         }
 
         if (lifeSystem != null && lifeSystem.IsDead())
@@ -185,8 +199,7 @@ public class GameManager : MonoBehaviour
     {
         comboTracker?.OnMistake();
         lifeSystem?.LoseLife();
-        //feedbackManager?.PlayWrong();
-        //feedbackManager?.UpdatePanGlow(0f, 0f);
+        // feedbackManager?.PlayWrong();
 
         if (lifeSystem != null && lifeSystem.IsDead())
             EndGame();
@@ -196,13 +209,32 @@ public class GameManager : MonoBehaviour
     {
         comboTracker?.OnMistake();
         lifeSystem?.LoseLife();
-        //feedbackManager?.PlayWrong();
+        // feedbackManager?.PlayWrong();
 
         if (lifeSystem != null && lifeSystem.IsDead())
             EndGame();
     }
 
+    // ────────────────────────────────────────────────────────────────
+    // Publika hjälpmetoder (anropas av subsystem)
+    // ────────────────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Sätter hastighetsmultiplikatorn. Anropas av BuffObject och NerfObject.
+    /// </summary>
+    public void SetFallSpeedMultiplier(float multiplier)
+    {
+        currentSpeedMultiplier = multiplier;
+    }
 
+    /// <summary>
+    /// Drar ett liv. Anropas av PanStack när stapeln tippar.
+    /// </summary>
+    public void LoseLife()
+    {
+        lifeSystem?.LoseLife();
 
+        if (lifeSystem != null && lifeSystem.IsDead())
+            EndGame();
+    }
 }

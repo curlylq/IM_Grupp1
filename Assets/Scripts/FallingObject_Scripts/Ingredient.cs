@@ -8,6 +8,7 @@ public class Ingredient : FallingObject
 
     public override void OnCaught(PanController pan)
     {
-
+        GameManager.Instance.OnObjectCought(this);
+        Destroy(gameObject);
     }
 }

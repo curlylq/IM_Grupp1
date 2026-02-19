@@ -6,8 +6,7 @@ public class WrongObject : FallingObject
 
     public override void OnCaught(PanController pan)
     {
-        Debug.Log($"Wrong object caught: {reason}");
-        GameManager.Instance.LoseLife();
+        GameManager.Instance.OnObjectCought(this);
         Destroy(gameObject);
     }
 }

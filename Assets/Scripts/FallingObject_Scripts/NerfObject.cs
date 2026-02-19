@@ -7,12 +7,12 @@ public class NerfObject : SpecialObject
     public override void ApplyEffect(GameManager gm)
     {
         gm.SetFallSpeedMultiplier(speedMultiplier);
-        Debug.Log("Nerf applied: Increased fall speed");
+        Debug.Log($"Nerf: fallhastighet ökad till {speedMultiplier * 100}%");
     }
 
     public override void RemoveEffect(GameManager gm)
     {
         gm.SetFallSpeedMultiplier(1f);
-        Debug.Log("Nerf removed: Normal speed restored");
+        Debug.Log("Nerf: fallhastighet återställd");
     }
 }
