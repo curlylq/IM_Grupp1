@@ -1,16 +1,18 @@
 using UnityEngine;
 
-public class NerfObject : MonoBehaviour
+public class NerfObject : SpecialObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private float speedMultiplier = 1.75f;
+
+    public override void ApplyEffect(GameManager gm)
     {
-        
+        gm.SetFallSpeedMultiplier(speedMultiplier);
+        Debug.Log("Nerf applied: Increased fall speed");
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void RemoveEffect(GameManager gm)
     {
-        
+        gm.SetFallSpeedMultiplier(1f);
+        Debug.Log("Nerf removed: Normal speed restored");
     }
 }
