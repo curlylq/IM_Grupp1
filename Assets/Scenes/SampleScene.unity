@@ -198,8 +198,13 @@ MonoBehaviour:
   spawnArea: {fileID: 114708236}
   safeZone: {fileID: 1198855220}
   gameManager: {fileID: 469905859}
-  ingredientPrefabs: []
-  wrongObjectPrefabs: []
+  ingredientPrefabs:
+  - {fileID: 282088156}
+  - {fileID: 628834995}
+  - {fileID: 943064193}
+  - {fileID: 678437932}
+  wrongObjectPrefabs:
+  - {fileID: 958948768}
   specialObjectPrefabs: []
   wrongChance: 0.25
   specialChance: 0.05
@@ -285,8 +290,31 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e37a1cdd7962e424693f750745e3080d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 282088156}
   m_SourcePrefab: {fileID: 100100000, guid: e37a1cdd7962e424693f750745e3080d, type: 3}
+--- !u!1 &282088155 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e37a1cdd7962e424693f750745e3080d, type: 3}
+  m_PrefabInstance: {fileID: 282088154}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &282088156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282088155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ff0308b4400174aaf2120f090d129c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ingredient
+  fallSpeed: 3
+  type: 2
+  weight: 1
 --- !u!1 &295374695
 GameObject:
   m_ObjectHideFlags: 0
@@ -560,8 +588,31 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6b74ba498bd44eb469ffbd21693b0890, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 628834995}
   m_SourcePrefab: {fileID: 100100000, guid: 6b74ba498bd44eb469ffbd21693b0890, type: 3}
+--- !u!1 &628834994 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 6b74ba498bd44eb469ffbd21693b0890, type: 3}
+  m_PrefabInstance: {fileID: 628834993}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &628834995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628834994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ff0308b4400174aaf2120f090d129c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ingredient
+  fallSpeed: 3
+  type: 1
+  weight: 1
 --- !u!1001 &678437930
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -629,8 +680,31 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ff0afb392a7d05f4890dc52ba35b272f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 678437932}
   m_SourcePrefab: {fileID: 100100000, guid: ff0afb392a7d05f4890dc52ba35b272f, type: 3}
+--- !u!1 &678437931 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: ff0afb392a7d05f4890dc52ba35b272f, type: 3}
+  m_PrefabInstance: {fileID: 678437930}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &678437932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 678437931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ff0308b4400174aaf2120f090d129c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ingredient
+  fallSpeed: 3
+  type: 0
+  weight: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -6071,8 +6145,31 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f5c985b5807307a408efd148c21e868a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 943064193}
   m_SourcePrefab: {fileID: 100100000, guid: f5c985b5807307a408efd148c21e868a, type: 3}
+--- !u!1 &943064192 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f5c985b5807307a408efd148c21e868a, type: 3}
+  m_PrefabInstance: {fileID: 943064191}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &943064193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943064192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ff0308b4400174aaf2120f090d129c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ingredient
+  fallSpeed: 3
+  type: 3
+  weight: 1
 --- !u!1 &945679058
 GameObject:
   m_ObjectHideFlags: 0
@@ -6244,8 +6341,31 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c2114833c4ea3142a440972f79b21b0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 958948768}
   m_SourcePrefab: {fileID: 100100000, guid: 9c2114833c4ea3142a440972f79b21b0, type: 3}
+--- !u!1 &958948767 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c2114833c4ea3142a440972f79b21b0, type: 3}
+  m_PrefabInstance: {fileID: 958948766}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &958948768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 958948767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ff0308b4400174aaf2120f090d129c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ingredient
+  fallSpeed: 3
+  type: 4
+  weight: 1
 --- !u!1 &1198855219
 GameObject:
   m_ObjectHideFlags: 0
