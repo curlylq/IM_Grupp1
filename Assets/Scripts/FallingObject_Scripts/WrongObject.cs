@@ -1,16 +1,13 @@
 using UnityEngine;
 
-public class Ing : MonoBehaviour
+public class WrongObject : FallingObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public string reason = "Wrong ingredient!";
 
-    // Update is called once per frame
-    void Update()
+    public override void OnCaught(PanController pan)
     {
-        
+        Debug.Log($"Wrong object caught: {reason}");
+        GameManager.Instance.LoseLife();
+        Destroy(gameObject);
     }
 }

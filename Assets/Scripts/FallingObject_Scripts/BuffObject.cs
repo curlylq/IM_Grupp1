@@ -1,16 +1,18 @@
 using UnityEngine;
 
-public class BuffObject : MonoBehaviour
+public class BuffObject : SpecialObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private float slowMultiplier = 0.5f;
+
+    public override void ApplyEffect(GameManager gm)
     {
-        
+        gm.SetFallSpeedMultiplier(slowMultiplier);
+        Debug.Log("Buff applied: Slow fall speed");
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void RemoveEffect(GameManager gm)
     {
-        
+        gm.SetFallSpeedMultiplier(1f);
+        Debug.Log("Buff removed: Normal fall speed restored");
     }
 }
