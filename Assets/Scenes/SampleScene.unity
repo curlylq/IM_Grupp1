@@ -6176,7 +6176,7 @@ MonoBehaviour:
       m_Calls: []
   m_SerializedLibrary: {fileID: 11400000, guid: a2df37f316e859f43b97e0c872d2a315, type: 2}
   m_MaxNumberOfMovingImages: 1
-  m_TrackedImagePrefab: {fileID: 0}
+  m_TrackedImagePrefab: {fileID: 1384280452}
 --- !u!1001 &958948766
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6457,6 +6457,7 @@ GameObject:
   - component: {fileID: 1384280453}
   - component: {fileID: 1384280455}
   - component: {fileID: 1384280454}
+  - component: {fileID: 1384280456}
   m_Layer: 0
   m_Name: PanProxy
   m_TagString: Untagged
@@ -6528,6 +6529,25 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1384280456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1384280452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d76b580143a45e409813e810b1015b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PanTrackedImageFollower
+  trackedImageManager: {fileID: 0}
+  panProxy: {fileID: 0}
+  referenceImageName: 
+  positionOffsetMeters: {x: 0, y: 0, z: 0}
+  rotationOffsetEuler: {x: 0, y: 0, z: 0}
+  positionLerp: 20
+  rotationLerp: 20
 --- !u!1 &1843791761
 GameObject:
   m_ObjectHideFlags: 0
