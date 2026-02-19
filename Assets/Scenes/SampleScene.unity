@@ -6543,8 +6543,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d76b580143a45e409813e810b1015b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PanTrackedImageFollower
-  trackedImageManager: {fileID: 0}
-  panProxy: {fileID: 0}
+  trackedImageManager: {fileID: 945679063}
+  panProxy: {fileID: 1384280453}
   referenceImageName: 
   positionOffsetMeters: {x: 0, y: 0, z: 0}
   rotationOffsetEuler: {x: 0, y: 0, z: 0}
