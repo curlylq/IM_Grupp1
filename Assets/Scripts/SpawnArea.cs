@@ -5,6 +5,12 @@ public class SpawnArea : MonoBehaviour
     [SerializeField] private Vector2 size = new Vector2(2f, 1f);
     [SerializeField] private float z = 0f;
 
+    // Publika properties så StartZone (och andra) kan läsa dimensioner
+    public float width => size.x;
+    public float height => size.y;
+    public float centerX => transform.position.x;
+    public float centerY => transform.position.y;
+
     public Vector3 GetRandomPoint()
     {
         Vector3 center = transform.position;

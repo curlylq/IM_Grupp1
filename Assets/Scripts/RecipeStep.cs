@@ -1,15 +1,18 @@
-using UnityEngine;
+using static Enums;
 
-public class RecipeStep : MonoBehaviour
+/// <summary>
+/// Representerar ett steg i ett recept.
+/// Vanlig C#-klass (inte MonoBehaviour) så att konstruktor fungerar normalt.
+/// </summary>
+[System.Serializable]
+public class RecipeStep
 {
+    public int order;
+    public IngredientType ingredientType;
 
-    private int order;
-    private Enums.IngredientType IngredientType { get; }
-
-
-  public RecipeStep(int order, Enums.IngredientType ingredientType)
+    public RecipeStep(int order, IngredientType ingredientType)
     {
         this.order = order;
-        this.IngredientType = ingredientType;
+        this.ingredientType = ingredientType;
     }
 }

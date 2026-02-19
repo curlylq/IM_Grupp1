@@ -1,28 +1,25 @@
 using System.Collections.Generic;
-using UnityEngine;
-using static Enums;
 
-public class Recipe : MonoBehaviour
+/// <summary>
+/// Representerar ett recept med en ordnad lista av steg.
+/// Vanlig C#-klass (inte MonoBehaviour) så att konstruktor fungerar normalt.
+/// </summary>
+[System.Serializable]
+public class Recipe
 {
     public string Name { get; }
     private readonly List<RecipeStep> steps;
-
     public IReadOnlyList<RecipeStep> Steps => steps;
 
     public Recipe(string name, List<RecipeStep> steps)
     {
-        Name = name;
+        this.Name = name;
         this.steps = steps;
     }
 
     public RecipeStep GetStep(int index)
     {
         if (index < 0 || index >= steps.Count) return null;
-
-
         return steps[index];
-    }    
-
-
-
+    }
 }

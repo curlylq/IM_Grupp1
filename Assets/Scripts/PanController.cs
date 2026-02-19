@@ -79,7 +79,7 @@ public class PanController : MonoBehaviour
         FallingObject fallingObj = other.GetComponent<FallingObject>();
         if (fallingObj != null)
         {
-            GameManager.Instance.OnObjectCaught(fallingObj);
+            GameManager.Instance.OnObjectCought(fallingObj);
             fallingObj.OnCaught(this);
         }
     }
