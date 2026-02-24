@@ -29,3 +29,23 @@ MonoBehaviour:
     m_SpecifySize: 0
     m_Name: ImageTracker
     m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5361239109718790218
+      m_GuidHigh: 1939856798435189127
+    m_SerializedTextureGuid:
+      m_GuidLow: 2643004529649882887
+      m_GuidHigh: 10677130273123681019
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: one
+    m_Texture: {fileID: 2800000, guid: d1879707d69d24adfb421bde69c92c94, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 4632257038725600750
+      m_GuidHigh: 13077462941867608726
+    m_SerializedTextureGuid:
+      m_GuidLow: 8384093242107071099
+      m_GuidHigh: 13653593495684243370
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: two
+    m_Texture: {fileID: 2800000, guid: 038b8a7b4862745aaadfd7c9f14e7bbd, type: 3}
