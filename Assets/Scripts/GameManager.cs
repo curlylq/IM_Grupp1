@@ -31,6 +31,18 @@ public class GameManager : MonoBehaviour
     // Unity-livscykel
     // ────────────────────────────────────────────────────────────────
 
+    [SerializeField] private bool autoStartInEditor = true;
+
+    private void Start()
+    {
+#if UNITY_EDITOR
+        if (autoStartInEditor)
+            StartGame();
+#endif
+    }
+
+
+
     private void Awake()
     {
         // Singleton-setup: förstör duplicat om det finns
@@ -65,6 +77,7 @@ public class GameManager : MonoBehaviour
             case GameState.Starting:
                 // Kan bytas mot countdown/intro-animation
                 state = GameState.Playing;
+                spawner?.StartSpawning();   
                 break;
 
             case GameState.Playing:
