@@ -1,5 +1,8 @@
 {
   "dependencies": {
+    "com.meta.xr.sdk.core": "85.0.0",
+    "com.meta.xr.sdk.interaction.ovr": "85.0.0",
+    "com.meta.xr.simulator": "81.0.0",
     "com.unity.collab-proxy": "2.11.2",
     "com.unity.feature.development": "1.0.2",
     "com.unity.inputsystem": "1.17.0",
@@ -7,7 +10,6 @@
     "com.unity.timeline": "1.8.10",
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.9",
-    "com.unity.xr-content.xr-sim-environments": "file:../ContentPackages\\com.unity.xr-content.xr-sim-environments-2.1.1.tgz",
     "com.unity.xr.arcore": "6.3.3",
     "com.unity.xr.arfoundation": "6.3.3",
     "com.unity.xr.openxr": "1.16.1",
