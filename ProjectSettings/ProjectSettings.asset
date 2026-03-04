@@ -147,11 +147,6 @@ PlayerSettings:
   preloadedAssets:
   - {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
   - {fileID: 11400000, guid: 154fa7c2b06367f4db7ee82c3e8c66f1, type: 2}
-  - {fileID: 11400000, guid: 925c107ba343e1649aeb586a4f466e8b, type: 2}
-  - {fileID: -7499171390687672104, guid: ccd24580c4e4e004ab17bfb3360daa42, type: 2}
-  - {fileID: 2019066574946723024, guid: 8450ceeae521e494f888239016068d66, type: 2}
-  - {fileID: 4800000, guid: c9f956787b1d945e7b36e0516201fc76, type: 3}
-  - {fileID: 4800000, guid: 0945859e5a1034c2cb6dce53cb4fb899, type: 3}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -181,8 +176,8 @@ PlayerSettings:
     tvOS: 0
   overrideDefaultApplicationIdentifier: 0
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 32
-  AndroidTargetSdkVersion: 34
+  AndroidMinSdkVersion: 25
+  AndroidTargetSdkVersion: 25
   AndroidPreferredInstallLocation: 0
   AndroidPreferredDataLocation: 1
   aotOptions: 
@@ -395,7 +390,10 @@ PlayerSettings:
       m_Height: 36
       m_Kind: 0
       m_SubKind: 
-  m_BuildTargetBatching: []
+  m_BuildTargetBatching:
+  - m_BuildTarget: Android
+    m_StaticBatching: 1
+    m_DynamicBatching: 0
   m_BuildTargetShaderSettings: []
   m_BuildTargetGraphicsJobs:
   - m_BuildTarget: AndroidPlayer
@@ -418,7 +416,7 @@ PlayerSettings:
   openGLRequireES32: 0
   m_TemplateCustomTags: {}
   mobileMTRendering:
-    Android: 1
+    Android: 0
     VisionOS: 1
     iPhone: 1
     tvOS: 1
