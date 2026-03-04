@@ -383,6 +383,60 @@ Transform:
   - {fileID: 581151759}
   m_Father: {fileID: 1107357638}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &355923387
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 355923389}
+  - component: {fileID: 355923388}
+  m_Layer: 0
+  m_Name: MqttManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &355923388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 355923387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5782227dec2fc4f22b184d846f1c3a14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ExtralityLab.MqttClientExampleBidirectional
+  brokerAddress: broker.hivemq.com
+  brokerPort: 1883
+  isEncrypted: 0
+  connectionDelay: 500
+  timeoutOnConnection: 30000
+  autoConnect: 1
+  mqttUserName: 
+  mqttPassword: 
+  publishTopicName: IM_Grupp1/led
+  subscribedTopic: IM_Grupp1/led
+--- !u!4 &355923389
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 355923387}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.48236, y: 0, z: 12.386}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &421130598
 GameObject:
   m_ObjectHideFlags: 0
@@ -11725,6 +11779,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PanTrackedImageFollower
   trackedImageManager: {fileID: 945679063}
   panProxy: {fileID: 1384280453}
+  mqttClient: {fileID: 355923388}
   referenceImageName: 
   positionOffsetMeters: {x: 0, y: 0, z: 0}
   rotationOffsetEuler: {x: 0, y: 0, z: 0}
@@ -11938,3 +11993,4 @@ SceneRoots:
   - {fileID: 1015746446}
   - {fileID: 925168818}
   - {fileID: 1859479762}
+  - {fileID: 355923389}
