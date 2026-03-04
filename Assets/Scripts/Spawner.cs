@@ -22,6 +22,7 @@ public class Spawner : MonoBehaviour
 
     public void StartSpawning()
     {
+        Debug.Log("StartSpawning called");
         running = true;
         timer = 0f;
         safeZone?.Activate();
@@ -29,6 +30,7 @@ public class Spawner : MonoBehaviour
 
     public void StopSpawning()
     {
+        Debug.Log("StopSpawning called");
         running = false;
     }
 
@@ -41,31 +43,38 @@ public class Spawner : MonoBehaviour
     {
         if (!running) return;
 
-        safeZone?.Tick(dt);
-
         float spawnsPerSecond = difficultyManager != null ? difficultyManager.GetSpawnRate() : 1f;
+
+        if (float.IsNaN(spawnsPerSecond) || float.IsInfinity(spawnsPerSecond))
+            Debug.LogError($"Spawn rate is invalid: {spawnsPerSecond}");
+
         float interval = Mathf.Max(0.05f, 1f / Mathf.Max(0.01f, spawnsPerSecond));
 
         timer += dt;
+
+        int spawnedThisFrame = 0;
         while (timer >= interval)
         {
             timer -= interval;
             SpawnOne();
+            spawnedThisFrame++;
+            if (spawnedThisFrame > 50) break; // prevent runaway spam
         }
+
+        if (spawnedThisFrame > 0)
+            Debug.Log($"Spawner running. Spawned {spawnedThisFrame}. Rate={spawnsPerSecond}, interval={interval}");
     }
 
     private void SpawnOne()
     {
-        if (spawnArea == null) return;
+        if (spawnArea == null) { Debug.LogError("No spawnArea"); return; }
 
         Vector3 pos = spawnArea.GetRandomPoint();
         FallingObject prefab = ChoosePrefab();
-        if (prefab == null) return;
+        if (prefab == null) { Debug.LogError("No prefab chosen"); return; }
 
-        FallingObject obj = Instantiate(prefab, pos, Quaternion.identity);
-
-        // Om dina FallingObject behöver init (t.ex. fallSpeed eller gm-referens)
-        // obj.Initialize(gameManager, difficultyManager.GetFallSpeed());
+        var obj = Instantiate(prefab, pos, Quaternion.identity);
+        Debug.Log($"Spawned {prefab.name} at {pos}");
     }
 
     private FallingObject ChoosePrefab()
