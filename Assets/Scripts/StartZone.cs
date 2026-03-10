@@ -46,16 +46,17 @@ public class StartZone : MonoBehaviour
     /// </summary>
     public bool Contains(PanController pan)
     {
-        if (area == null) return false;
+        if (area == null || pan == null) return false;
 
-        float halfWidth = area.width / 2f;
-        float halfHeight = area.height / 2f;
+        // Convert pan world position into SpawnArea local space
+        Vector3 local = area.transform.InverseTransformPoint(pan.transform.position);
 
-        bool withinX = pan.xPosition >= (area.centerX - halfWidth) &&
-                       pan.xPosition <= (area.centerX + halfWidth);
+        float halfWidth = area.width * 0.5f;
+        float halfHeight = area.height * 0.5f;
 
-        bool withinY = pan.transform.position.y >= (transform.position.y - halfHeight) &&
-                       pan.transform.position.y <= (transform.position.y + halfHeight);
+        // Local X/Y within rectangle
+        bool withinX = local.x >= -halfWidth && local.x <= halfWidth;
+        bool withinY = local.y >= -halfHeight && local.y <= halfHeight;
 
         return withinX && withinY;
     }
