@@ -2,7 +2,7 @@
 using UnityEngine;
 using static Enums;
 
-public class GameManager : MonoBehaviour
+/*public class GameManager : MonoBehaviour
 {
     // ── Singleton ────────────────────────────────────────────────────
     public static GameManager Instance { get; private set; }
@@ -250,4 +250,4 @@ public class GameManager : MonoBehaviour
         if (lifeSystem != null && lifeSystem.IsDead())
             EndGame();
     }
-}
+}*/

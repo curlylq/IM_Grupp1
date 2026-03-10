@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class SpecialObject : FallingObject
+/*public abstract class SpecialObject : FallingObject
 {
     [SerializeField] protected float duration = 5f;
 
@@ -17,4 +17,4 @@ public abstract class SpecialObject : FallingObject
 
     public abstract void ApplyEffect(GameManager gm);
     public abstract void RemoveEffect(GameManager gm);
-}
+}*/

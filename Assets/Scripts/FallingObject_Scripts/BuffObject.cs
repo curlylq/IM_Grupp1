@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BuffObject : SpecialObject
+/*public class BuffObject : SpecialObject
 {
     [SerializeField] private float slowMultiplier = 0.5f;
 
@@ -15,4 +15,4 @@ public class BuffObject : SpecialObject
         gm.SetFallSpeedMultiplier(1f);
         Debug.Log("Buff: fallhastighet återställd");
     }
-}
+}*/

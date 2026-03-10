@@ -5,7 +5,7 @@ using static Enums;
 /// Det gröna "håll pannan här"-området som spelaren måste hålla
 /// pannan i för att starta spelet. Definieras av ett SpawnArea.
 /// </summary>
-public class StartZone : MonoBehaviour
+/*public class StartZone : MonoBehaviour
 {
     [SerializeField] private SpawnArea area;
 
@@ -69,4 +69,4 @@ public class StartZone : MonoBehaviour
         holdTimer = 0f;
         hasTriggeredStart = false;
     }
-}
+}*/

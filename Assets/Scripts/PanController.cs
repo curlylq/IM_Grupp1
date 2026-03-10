@@ -5,7 +5,7 @@ using UnityEngine;
 /// Läser horisontell position och lutningsvinkel, och rapporterar
 /// till GameManager när objekt fångas.
 /// </summary>
-public class PanController : MonoBehaviour
+/*public class PanController : MonoBehaviour
 {
     [Header("Rörelse")]
     [SerializeField] private float xMin = -4f;
@@ -83,4 +83,4 @@ public class PanController : MonoBehaviour
             fallingObj.OnCaught(this);
         }
     }
-}
+}*/

@@ -3,7 +3,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using static Enums;
 
-public class RecipeManager : MonoBehaviour
+/*public class RecipeManager : MonoBehaviour
 {
     private Recipe activeRecipe;
     private int stepIndex;
@@ -42,4 +42,4 @@ public class RecipeManager : MonoBehaviour
         if (activeRecipe == null) return false;
         return stepIndex >= activeRecipe.Steps.Count;
     }
-}
+}*/

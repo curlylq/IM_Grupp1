@@ -1,7 +1,7 @@
 using UnityEngine;
 using static Enums;
 
-public class Ingredient : FallingObject
+/*public class Ingredient : FallingObject
 {
     public IngredientType type;
     public float weight = 1f;
@@ -11,4 +11,4 @@ public class Ingredient : FallingObject
         GameManager.Instance.OnObjectCought(this);
         Destroy(gameObject);
     }
-}
+}*/

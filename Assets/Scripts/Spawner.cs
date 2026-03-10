@@ -6,7 +6,7 @@ public class Spawner : MonoBehaviour
     [SerializeField] private DifficultyManager difficultyManager;
     [SerializeField] private SpawnArea spawnArea;
     [SerializeField] private SafeZone safeZone;
-    [SerializeField] private GameManager gameManager; // om FallingObject behöver veta gm
+    //[SerializeField] private GameManager gameManager; // om FallingObject behöver veta gm
 
     [Header("Prefabs")]
     [SerializeField] private FallingObject[] ingredientPrefabs;

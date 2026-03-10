@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class WrongObject : FallingObject
+/*public class WrongObject : FallingObject
 {
     public string reason = "Wrong ingredient!";
 
@@ -9,4 +9,4 @@ public class WrongObject : FallingObject
         GameManager.Instance.OnObjectCought(this);
         Destroy(gameObject);
     }
-}
+}*/

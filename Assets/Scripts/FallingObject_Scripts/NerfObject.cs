@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NerfObject : SpecialObject
+/*public class NerfObject : SpecialObject
 {
     [SerializeField] private float speedMultiplier = 1.75f;
 
@@ -15,4 +15,4 @@ public class NerfObject : SpecialObject
         gm.SetFallSpeedMultiplier(1f);
         Debug.Log("Nerf: fallhastighet återställd");
     }
-}
+}*/
