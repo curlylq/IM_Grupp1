@@ -12,7 +12,7 @@ public class PanTrackedImageFollower : MonoBehaviour
     [SerializeField] private MqttClientExampleBidirectional mqttClient;
 
     [Header("If you have multiple markers, set the name to follow (optional)")]
-    public string referenceImageName = "";
+    public string referenceImageName = "PanMarker";
 
     [Header("Alignment offsets (tune these to match the real pan)")]
     public Vector3 positionOffsetMeters = Vector3.zero;

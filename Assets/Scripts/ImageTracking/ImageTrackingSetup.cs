@@ -8,7 +8,7 @@ public class ImageTrackingSetup : MonoBehaviour
 
     void Awake()
     {
-        trackedImageManager.requestedMaxNumberOfMovingImages = 1;
+        trackedImageManager.requestedMaxNumberOfMovingImages = 2;
     }
 
     void OnEnable()
