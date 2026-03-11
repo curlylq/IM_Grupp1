@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -23,33 +22,49 @@ public class PanTrackedImageFollower : MonoBehaviour
     [Range(0f, 30f)] public float positionLerp = 20f;
     [Range(0f, 30f)] public float rotationLerp = 20f;
 
+    [Header("Debug")]
+    [SerializeField] private bool verboseLogs = false;
+
     private bool hasTarget;
     private bool ledIsOn = false;
     private bool hasCalled = false;
+
     private Vector3 targetPos;
     private Quaternion targetRot;
 
-    // Helps reduce log spam by logging only when something changes
     private bool lastAnyTracking = false;
+    private Rigidbody panRb;
 
     private void Awake()
     {
-        Debug.Log("[PanTrackedImageFollower] Awake()");
-
         if (trackedImageManager == null)
-        {
             trackedImageManager = FindObjectOfType<ARTrackedImageManager>();
-            Debug.Log($"[PanTrackedImageFollower] trackedImageManager auto-found: {(trackedImageManager != null)}");
+
+        if (panProxy != null)
+        {
+            panRb = panProxy.GetComponent<Rigidbody>();
+            if (panRb == null)
+            {
+                Debug.LogError("[PanTrackedImageFollower] PanProxy has no Rigidbody. Add one and set it Kinematic.");
+            }
+            else
+            {
+                if (!panRb.isKinematic)
+                    Debug.LogWarning("[PanTrackedImageFollower] PanProxy Rigidbody should be Kinematic for MovePosition/MoveRotation.");
+            }
         }
 
-        Debug.Log($"[PanTrackedImageFollower] mqttClient assigned: {(mqttClient != null)}");
-        Debug.Log($"[PanTrackedImageFollower] referenceImageName filter: '{referenceImageName}'");
-        Debug.Log($"[PanTrackedImageFollower] panProxy assigned: {(panProxy != null)}");
+        if (verboseLogs)
+        {
+            Debug.Log($"[PanTrackedImageFollower] trackedImageManager: {(trackedImageManager != null)}");
+            Debug.Log($"[PanTrackedImageFollower] mqttClient: {(mqttClient != null)}");
+            Debug.Log($"[PanTrackedImageFollower] referenceImageName: '{referenceImageName}'");
+            Debug.Log($"[PanTrackedImageFollower] panProxy: {(panProxy != null)} rb: {(panRb != null)}");
+        }
     }
 
     private void OnEnable()
     {
-        Debug.Log("[PanTrackedImageFollower] OnEnable()");
         if (trackedImageManager == null)
         {
             Debug.LogError("[PanTrackedImageFollower] trackedImageManager is NULL. Cannot track images.");
@@ -57,33 +72,22 @@ public class PanTrackedImageFollower : MonoBehaviour
         }
 
         trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
-        Debug.Log("[PanTrackedImageFollower] Subscribed to trackedImagesChanged.");
+
+        if (verboseLogs)
+            Debug.Log("[PanTrackedImageFollower] Subscribed to trackedImagesChanged.");
     }
 
     private void OnDisable()
     {
-        Debug.Log("[PanTrackedImageFollower] OnDisable()");
         if (trackedImageManager != null)
-        {
             trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+
+        if (verboseLogs)
             Debug.Log("[PanTrackedImageFollower] Unsubscribed from trackedImagesChanged.");
-        }
     }
 
     private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
     {
-        Debug.Log($"[PanTrackedImageFollower] trackedImagesChanged | added:{args.added.Count} updated:{args.updated.Count} removed:{args.removed.Count}");
-
-        // Log added/updated/removed with details
-        foreach (var img in args.added)
-            LogImage("ADDED", img);
-
-        foreach (var img in args.updated)
-            LogImage("UPDATED", img);
-
-        foreach (var img in args.removed)
-            LogImage("REMOVED", img);
-
         // Update follow target pose when image is TRACKING
         foreach (var img in args.added) UpdatePoseIfMatch(img);
         foreach (var img in args.updated) UpdatePoseIfMatch(img);
@@ -91,37 +95,23 @@ public class PanTrackedImageFollower : MonoBehaviour
         // Decide LED state based on whether ANY matching image is currently TRACKING
         bool anyTracking = AnyMatchingImageTracking();
 
-        if (anyTracking != lastAnyTracking)
-        {
+        if (anyTracking != lastAnyTracking && verboseLogs)
             Debug.Log($"[PanTrackedImageFollower] anyTracking changed -> {anyTracking}");
-            lastAnyTracking = anyTracking;
-        }
 
-        // Validate mqttClient reference
-        if (mqttClient == null)
-        {
-            Debug.LogError("[PanTrackedImageFollower] mqttClient is NULL (Inspector not assigned?). LED publish cannot happen.");
-            return;
-        }
+        lastAnyTracking = anyTracking;
 
-        // Validate MQTT connection
-        if (!mqttClient.IsConnected)
-        {
-            Debug.LogWarning("[PanTrackedImageFollower] MQTT not connected yet. Skipping publish this frame.");
-            // Important: Do NOT flip ledIsOn here, because we did not publish.
+        // MQTT is optional; don't block tracking if it's missing
+        if (mqttClient == null || !mqttClient.IsConnected)
             return;
-        }
 
         // Publish only on state change
         if (anyTracking && !ledIsOn)
         {
-            Debug.Log("[PanTrackedImageFollower] AR -> MQTT publish TRUE");
             mqttClient.PublishTopicValue("true");
             ledIsOn = true;
         }
         else if (!anyTracking && ledIsOn)
         {
-            Debug.Log("[PanTrackedImageFollower] AR -> MQTT publish FALSE");
             mqttClient.PublishTopicValue("false");
             ledIsOn = false;
         }
@@ -133,7 +123,6 @@ public class PanTrackedImageFollower : MonoBehaviour
 
         foreach (var tracked in trackedImageManager.trackables)
         {
-            // Filter by name if set
             if (!string.IsNullOrEmpty(referenceImageName) &&
                 tracked.referenceImage.name != referenceImageName)
                 continue;
@@ -148,29 +137,19 @@ public class PanTrackedImageFollower : MonoBehaviour
     {
         if (img == null) return;
 
-        // Filter by name if set
         if (!string.IsNullOrEmpty(referenceImageName) &&
             img.referenceImage.name != referenceImageName)
-        {
-            Debug.Log($"[PanTrackedImageFollower] Ignoring image '{img.referenceImage.name}' due to filter '{referenceImageName}'");
             return;
-        }
 
-        // Only update target pose when actually TRACKING
         if (img.trackingState != TrackingState.Tracking)
-        {
-            Debug.Log($"[PanTrackedImageFollower] Image '{img.referenceImage.name}' is not TRACKING (state: {img.trackingState}), not updating pose.");
             return;
-        }
 
-        //Markera att vi hittat den genom ett call till MQTT
-
-        if (!hasCalled)
+        // Optional one-time call when first found
+        if (!hasCalled && mqttClient != null && mqttClient.IsConnected)
         {
             mqttClient.PublishTopicValue("true");
             hasCalled = true;
-        };
-
+        }
 
         Pose markerPose = new Pose(img.transform.position, img.transform.rotation);
         Quaternion rotOffset = Quaternion.Euler(rotationOffsetEuler);
@@ -180,27 +159,30 @@ public class PanTrackedImageFollower : MonoBehaviour
 
         hasTarget = true;
 
-        Debug.Log($"[PanTrackedImageFollower] Updated pose from '{img.referenceImage.name}' | targetPos:{targetPos} targetRotEuler:{targetRot.eulerAngles}");
+        if (verboseLogs)
+            Debug.Log($"[PanTrackedImageFollower] Target updated from '{img.referenceImage.name}' pos:{targetPos} rot:{targetRot.eulerAngles}");
     }
 
-    private void LogImage(string label, ARTrackedImage img)
-    {
-        if (img == null)
-        {
-            Debug.Log($"[PanTrackedImageFollower] {label} image: NULL");
-            return;
-        }
-
-        Debug.Log($"[PanTrackedImageFollower] {label} image '{img.referenceImage.name}' | state:{img.trackingState} " +
-                  $"pos:{img.transform.position} rot:{img.transform.rotation.eulerAngles}");
-    }
-
-    private void Update()
+    private void FixedUpdate()
     {
         if (!hasTarget || panProxy == null) return;
 
-        panProxy.position = Vector3.Lerp(panProxy.position, targetPos, Time.deltaTime * positionLerp);
-        panProxy.rotation = Quaternion.Slerp(panProxy.rotation, targetRot, Time.deltaTime * rotationLerp);
+        // Smooth toward target in physics time-step
+        float dt = Time.fixedDeltaTime;
+        Vector3 newPos = Vector3.Lerp(panProxy.position, targetPos, dt * positionLerp);
+        Quaternion newRot = Quaternion.Slerp(panProxy.rotation, targetRot, dt * rotationLerp);
+
+        // Move through physics so rigidbodies ride the pan
+        if (panRb != null)
+        {
+            panRb.MovePosition(newPos);
+            panRb.MoveRotation(newRot);
+        }
+        else
+        {
+            // Fallback: still works visually, but physics will be worse
+            panProxy.SetPositionAndRotation(newPos, newRot);
+        }
     }
 }
 
