@@ -21,12 +21,12 @@ MonoBehaviour:
       m_GuidLow: 5361239109718790218
       m_GuidHigh: 1939856798435189127
     m_SerializedTextureGuid:
-      m_GuidLow: 16097099549441388333
-      m_GuidHigh: 420329339873541321
-    m_Size: {x: 1, y: 0.988785}
+      m_GuidLow: 5202800404780731918
+      m_GuidHigh: 18170507539546795514
+    m_Size: {x: 0.2, y: 0.19812031}
     m_SpecifySize: 1
     m_Name: PanMarker
-    m_Texture: {fileID: 2800000, guid: 0e8def2d62c1df64c93cd6bf4e4fd505, type: 3}
+    m_Texture: {fileID: 2800000, guid: 0c36ce0e0f674834fa6d3ef3559c2afc, type: 3}
   - m_SerializedGuid:
       m_GuidLow: 5143155755367967478
       m_GuidHigh: 13556816580948981434

@@ -1,7 +1,8 @@
+using ExtralityLab;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using ExtralityLab;
 
 public class PanTrackedImageFollower : MonoBehaviour
 {
@@ -38,7 +39,7 @@ public class PanTrackedImageFollower : MonoBehaviour
     private void Awake()
     {
         if (trackedImageManager == null)
-            trackedImageManager = FindObjectOfType<ARTrackedImageManager>();
+            trackedImageManager = Object.FindFirstObjectByType<ARTrackedImageManager>();
 
         if (panProxy != null)
         {
@@ -71,22 +72,22 @@ public class PanTrackedImageFollower : MonoBehaviour
             return;
         }
 
-        trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
+        trackedImageManager.trackablesChanged.AddListener(OnTrackedImagesChanged);
 
         if (verboseLogs)
-            Debug.Log("[PanTrackedImageFollower] Subscribed to trackedImagesChanged.");
+            Debug.Log("[PanTrackedImageFollower] Subscribed to trackablesChanged.");
     }
 
     private void OnDisable()
     {
         if (trackedImageManager != null)
-            trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+            trackedImageManager.trackablesChanged.RemoveListener(OnTrackedImagesChanged);
 
         if (verboseLogs)
-            Debug.Log("[PanTrackedImageFollower] Unsubscribed from trackedImagesChanged.");
+            Debug.Log("[PanTrackedImageFollower] Unsubscribed from trackablesChanged.");
     }
 
-    private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
+    private void OnTrackedImagesChanged(UnityEngine.XR.ARFoundation.ARTrackablesChangedEventArgs<ARTrackedImage> args)
     {
         // Update follow target pose when image is TRACKING
         foreach (var img in args.added) UpdatePoseIfMatch(img);

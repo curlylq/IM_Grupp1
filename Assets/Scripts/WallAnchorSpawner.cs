@@ -2,80 +2,96 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-[RequireComponent(typeof(ARTrackedImageManager))]
 public class WallAnchorSpawner : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private ARTrackedImageManager trackedImageManager;
-
-    [Tooltip("Root object containing SpawnArea + SimpleSpawner. This will be moved to the wall anchor.")]
     [SerializeField] private Transform spawnerRoot;
 
     [Header("Wall Marker")]
-    [Tooltip("Reference image name for the wall marker (must match XR Reference Image Library entry).")]
     [SerializeField] private string wallImageName = "WallMarker";
 
-    [Header("Anchor Behavior")]
-    [Tooltip("If true, we anchor once and stop updating the spawner position (most stable).")]
-    [SerializeField] private bool anchorOnce = true;
+    [Header("Placement")]
+    [Tooltip("Meters in front of the wall marker (along its forward). Flip sign if it ends up behind.")]
+    [SerializeField] private float forwardOffset = 0.25f;
 
-    [Tooltip("Optional offsets relative to the wall image pose.")]
-    [SerializeField] private Vector3 positionOffsetMeters = Vector3.zero;
+    [Tooltip("Meters up from marker center.")]
+    [SerializeField] private float upOffset = 0.0f;
+
+    [Tooltip("Optional rotation offset.")]
     [SerializeField] private Vector3 rotationOffsetEuler = Vector3.zero;
 
-    private ARAnchor anchor;
+    [Header("Behavior")]
+    [SerializeField] private bool anchorOnce = true;
+
     private bool anchored;
 
     private void Awake()
     {
         if (trackedImageManager == null)
-            trackedImageManager = GetComponent<ARTrackedImageManager>();
+            trackedImageManager = Object.FindFirstObjectByType<ARTrackedImageManager>();
     }
 
     private void OnEnable()
     {
-        trackedImageManager.trackedImagesChanged += OnChanged;
+        if (trackedImageManager != null)
+            trackedImageManager.trackablesChanged.AddListener(OnChanged);
     }
 
     private void OnDisable()
     {
-        trackedImageManager.trackedImagesChanged -= OnChanged;
+        if (trackedImageManager != null)
+            trackedImageManager.trackablesChanged.RemoveListener(OnChanged);
     }
 
-    private void OnChanged(ARTrackedImagesChangedEventArgs args)
+    private void OnChanged(ARTrackablesChangedEventArgs<ARTrackedImage> args)
     {
-        foreach (var img in args.added) TryAnchor(img);
-        foreach (var img in args.updated) TryAnchor(img);
+        foreach (var img in args.added) TryLock(img);
+        foreach (var img in args.updated) TryLock(img);
     }
 
-    private void TryAnchor(ARTrackedImage img)
+    private void TryLock(ARTrackedImage img)
     {
+        if (anchored && anchorOnce) return;
         if (img.trackingState != TrackingState.Tracking) return;
         if (img.referenceImage.name != wallImageName) return;
         if (spawnerRoot == null) return;
 
-        // If we already anchored and only want to do it once, ignore later updates
-        if (anchored && anchorOnce) return;
+        // Compute pose once
+        Quaternion rotOffset = Quaternion.Euler(rotationOffsetEuler);
+        Quaternion worldRot = img.transform.rotation * rotOffset;
 
-        // Create anchor on first time
-        if (anchor == null)
+        Vector3 worldPos =
+            img.transform.position +
+            img.transform.forward * forwardOffset +
+            img.transform.up * upOffset;
+
+        // IMPORTANT: detach from any parent so it doesn't inherit AR/XR transforms
+        spawnerRoot.SetParent(null, true);
+
+        spawnerRoot.SetPositionAndRotation(worldPos, worldRot);
+
+        // -------- DEBUG: prove what moved --------
+        Debug.Log($"[WallAnchorSpawner] LOCKED '{wallImageName}' at pos {spawnerRoot.position} rot {spawnerRoot.rotation.eulerAngles}");
+        Debug.Log($"[WallAnchorSpawner] SpawnerRoot children: {spawnerRoot.childCount}");
+        foreach (Transform child in spawnerRoot)
+            Debug.Log($"  - child '{child.name}' worldPos {child.position}");
+
+        // -------- START SPAWNING (only after lock) --------
+        var simpleSpawner = spawnerRoot.GetComponentInChildren<SimpleSpawner>(true);
+        if (simpleSpawner != null)
         {
-            anchor = img.gameObject.AddComponent<ARAnchor>();
+            simpleSpawner.StartSpawning();
+            Debug.Log("[WallAnchorSpawner] Started SimpleSpawner.");
+        }
+        else
+        {
+            Debug.LogError("[WallAnchorSpawner] No SimpleSpawner found under SpawnerRoot!");
         }
 
-        // Apply offsets
-        Quaternion rotOffset = Quaternion.Euler(rotationOffsetEuler);
-        Pose p = new Pose(img.transform.position, img.transform.rotation);
-
-        Vector3 worldPos = p.position + p.rotation * positionOffsetMeters;
-        Quaternion worldRot = p.rotation * rotOffset;
-
-        // Move anchor to desired pose (anchor follows tracked image)
-        anchor.transform.SetPositionAndRotation(worldPos, worldRot);
-
-        // Parent spawner under the anchor so it becomes stable in world space
-        spawnerRoot.SetParent(anchor.transform, worldPositionStays: true);
-
         anchored = true;
+
+        if (anchorOnce)
+            enabled = false;
     }
 }
