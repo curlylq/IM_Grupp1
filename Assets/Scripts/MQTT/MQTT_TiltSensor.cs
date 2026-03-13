@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using M2MqttUnity;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using UnityEngine;
@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ExtralityLab
 {
-    public class MqttClientExampleBidirectional : M2MqttUnityClient
+    public class MQTT_TiltSensor: M2MqttUnityClient
     {
         [Header("Topics Config")]
         public string publishTopicName = "myUnityApp/digital";
@@ -68,7 +68,11 @@ namespace ExtralityLab
             if (subscribedTopic == topic)
             {
                 // TODO: Decide here on what to do when a message is received
-                Debug.Log($"Topic matches: {topic}! Do something with message: {message} ");
+                // Debug.Log($"Topic matches: {topic}! Do something with message: {message} ");
+
+                // Skicka vidare till ProcessMessage
+                ProcessMessage(msg);
+
             }
         }
 
@@ -79,15 +83,22 @@ namespace ExtralityLab
 
         private void ProcessMessage(string msg)
         {
-            Debug.Log("Received: " + msg);
+            // Debug.Log("Received: " + msg);
+            if (msg == "true")
+            {
+                Debug.Log("Tappat ett liv"); //HÄR HANTERAS VAD SOM HÄNDER NÄR DEN GÅR ÖVER VAD SOM ÄR GODKÄNT TILT
+            }
+
+            // Här kan du lägga till fler meddelanden i framtiden
+
         }
 
         private void OnDestroy()
         {
             Disconnect();
         }
-        
 
+        //Skicka nått från unity till Audorino typ en lampa
         ////// CALLBACKS from Buttons
         public void PublishInitialTopic()
         {
@@ -115,7 +126,7 @@ namespace ExtralityLab
         public void UnsubscribeFromTopic()
         {
             UnsubscribeTopics();
-        } 
-        
+        }
+
     }
 }

@@ -102,7 +102,7 @@ public class PanTrackedImageFollower : MonoBehaviour
         lastAnyTracking = anyTracking;
 
         // MQTT is optional; don't block tracking if it's missing
-        if (mqttClient == null || !mqttClient.IsConnected)
+        if (mqttClient == null) //|| !mqttClient.IsConnected)
             return;
 
         // Publish only on state change
@@ -146,7 +146,7 @@ public class PanTrackedImageFollower : MonoBehaviour
             return;
 
         // Optional one-time call when first found
-        if (!hasCalled && mqttClient != null && mqttClient.IsConnected)
+        if (!hasCalled && mqttClient != null )//&& mqttClient.IsConnected)
         {
             mqttClient.PublishTopicValue("true");
             hasCalled = true;
