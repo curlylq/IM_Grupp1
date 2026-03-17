@@ -15,6 +15,10 @@ namespace ExtralityLab
 
         private List<string> eventMessages = new List<string>();
 
+        public HealthManager playerHealth; // Dra in spelaren i inspector
+
+        private bool canTakeDamage = true;
+
         protected override void Start()
         {
             // Keep this message below
@@ -84,13 +88,26 @@ namespace ExtralityLab
         private void ProcessMessage(string msg)
         {
             // Debug.Log("Received: " + msg);
-            if (msg == "true")
+            if (msg == "true" && canTakeDamage)
             {
                 Debug.Log("Tappat ett liv"); //HÄR HANTERAS VAD SOM HÄNDER NÄR DEN GÅR ÖVER VAD SOM ÄR GODKÄNT TILT
+
+                playerHealth.TakeDamage(); // Tar bort 1 hjärta
+
+                canTakeDamage = false;
+
+                Invoke("SetTimerHeart", 2);
+
+
             }
 
             // Här kan du lägga till fler meddelanden i framtiden
 
+        }
+
+        private void SetTimerHeart()
+        {
+            canTakeDamage = true;
         }
 
         private void OnDestroy()

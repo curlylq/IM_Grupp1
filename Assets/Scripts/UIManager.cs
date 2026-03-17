@@ -38,7 +38,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        ShowStartScreen();
+       // ShowStartScreen();
     }
 
     // =========================================================

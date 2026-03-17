@@ -200,7 +200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FallingObject
   isCorrect: 1
-  maxFallSpeed: 1.5
+  maxFallSpeed: 0.5
   fallAcceleration: 20
   carryStrength: 1
 --- !u!54 &2094784730573857422
@@ -249,5 +249,5 @@ BoxCollider:
   m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.6130514, y: 0.19796883, z: 0.6251915}
-  m_Center: {x: -0.00053834915, y: -0.116139956, z: 0.009043425}
+  m_Size: {x: 0.41502276, y: 0.11090228, z: 0.41228142}
+  m_Center: {x: 0.0022635013, y: -0.07260668, z: 0.0023161918}
