@@ -12,6 +12,9 @@ using static Enums;
     {
         activeRecipe = recipe;
         stepIndex = 0;
+
+        var expected = GetExpectedIngredient();
+        UIManager.Instance?.UpdateRecipe(expected?.ToString() ?? ""); //visa första ingrediens /kevin
     }
 
     public IngredientType? GetExpectedIngredient()
@@ -31,6 +34,10 @@ using static Enums;
         if (ingredient.type == expected) // Fix 2: liten bokstav, matchar Ingredient.type
         {
             stepIndex++;
+
+            var next = GetExpectedIngredient();
+            UIManager.Instance?.UpdateRecipe(next?.ToString() ?? "Recept klart"); //UI recept klart /kevin
+
             return CatchResult.Correct;
         }
 

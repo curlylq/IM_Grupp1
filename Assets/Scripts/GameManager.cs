@@ -35,6 +35,7 @@ using static Enums;
 
     private void Start()
     {
+        UIManager.Instance?.ShowStartScreen(); // visa startskärm /kevin
 #if UNITY_EDITOR
         if (autoStartInEditor)
             StartGame();
@@ -104,6 +105,9 @@ using static Enums;
         // recipeManager?.NewRecipe();
         // spawner?.ActivateSafeZone();
         // feedbackManager?.PlayNewRecipe();
+
+        UIManager.Instance?.ShowGameUI(); // visa spel-UI /kevin
+        UIManager.Instance?.UpdateScore(0); // poängdisplay /kevin
     }
 
     /// <summary>
@@ -115,6 +119,8 @@ using static Enums;
 
         // spawner?.Stop();
         // feedbackManager?.PlayGameOver();
+
+        UIManager.Instance?.ShowGameOverScreen(); // game over :( /kevin
     }
 
     private void TickPlaying(float dt)
@@ -186,6 +192,7 @@ using static Enums;
                 int points = Mathf.RoundToInt(comboTracker != null ? comboTracker.GetMultiplier() : 1f);
                 scoreSystem?.AddPoints(points);
                 // feedbackManager?.PlayCorrect();
+                UIManager.Instance?.UpdateScore(scoreSystem); // uppdatera poängdisplay /kevin
                 break;
 
             case CatchResult.WrongOrder:
@@ -193,6 +200,8 @@ using static Enums;
                 comboTracker?.OnMistake();
                 lifeSystem?.LoseLife();
                 // feedbackManager?.PlayWrong();
+                string nextName = recipeManager.GetExpectedIngredient()?.toString() ?? "";
+                UIManager.Instance?.ShowTemporaryMessage("FEL -1 liv", 1.5f, nextName); // fel ingrediens UI /kevin
                 break;
         }
 
@@ -213,6 +222,8 @@ using static Enums;
         comboTracker?.OnMistake();
         lifeSystem?.LoseLife();
         // feedbackManager?.PlayWrong();
+
+        UIManager.Instance?.ShowTemporaryMessage("FEL -1 liv", 1.5f, recipeManager.GetExpectedIngredient()?.ToString() ?? ""); // fel objekt fångat /kevin
 
         if (lifeSystem != null && lifeSystem.IsDead())
             EndGame();
