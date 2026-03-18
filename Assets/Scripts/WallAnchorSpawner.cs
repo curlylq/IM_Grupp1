@@ -86,7 +86,7 @@ public class WallAnchorSpawner : MonoBehaviour
         if (simpleSpawner != null)
         {
             
-            TimeManager.countDown();
+            TimeManager.StartCountdownAndGame();
             
             Debug.Log("[WallAnchorSpawner] Started SimpleSpawner.");
         }

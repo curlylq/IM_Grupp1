@@ -1382,11 +1382,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c5a0e858b302574abf9db2507bd1f3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimeManager
-  startTime: 0
   endTime: 90
-  timeLeft: 3
+  countdownStart: 3
   countdownText: {fileID: 2018734918}
-  SimpleSpawner: {fileID: 230127771}
+  simpleSpawner: {fileID: 0}
+  uiManager: {fileID: 0}
 --- !u!4 &868772510
 Transform:
   m_ObjectHideFlags: 0
@@ -1800,8 +1800,8 @@ MonoBehaviour:
   upOffset: 0
   rotationOffsetEuler: {x: 0, y: 0, z: 0}
   anchorOnce: 1
-  UIManager: {fileID: 0}
-  TimeManager: {fileID: 0}
+  UIManager: {fileID: 691698226}
+  TimeManager: {fileID: 868772509}
 --- !u!1 &1027289376
 GameObject:
   m_ObjectHideFlags: 0

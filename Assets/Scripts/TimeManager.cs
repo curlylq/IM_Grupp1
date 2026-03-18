@@ -1,4 +1,90 @@
 using System;
+using System.Collections;
+using UnityEngine;
+using TMPro;
+
+public class TimeManager : MonoBehaviour
+{
+    [Header("Game Timer")]
+    [SerializeField] private float endTime = 90f;
+    private float currentTime = 0f;
+    private bool isRunning = false;
+
+    public Action<float> OnTimeUpdated;
+    public Action OnTimeUp;
+
+    [Header("Countdown")]
+    [SerializeField] private float countdownStart = 3f;
+    public TMP_Text countdownText;
+
+    [Header("References")]
+    public SimpleSpawner simpleSpawner;
+    public UIManager uiManager;
+
+    private bool hasStarted = false;
+
+    private void Update()
+    {
+        if (!isRunning) return;
+
+        currentTime += Time.deltaTime;
+        OnTimeUpdated?.Invoke(currentTime);
+
+        if (currentTime >= endTime)
+        {
+            isRunning = false;
+            OnTimeUp?.Invoke();
+
+            if (simpleSpawner != null)
+                simpleSpawner.StopSpawning();
+
+            if (uiManager != null)
+                uiManager.ShowGameOver();
+        }
+    }
+
+    public void StartCountdownAndGame()
+    {
+        if (hasStarted) return;
+        hasStarted = true;
+        StartCoroutine(CountdownRoutine());
+    }
+
+    private IEnumerator CountdownRoutine()
+    {
+        float timeLeft = countdownStart;
+
+        if (countdownText != null)
+            countdownText.gameObject.SetActive(true);
+
+        while (timeLeft > 0)
+        {
+            if (countdownText != null)
+                countdownText.text = Mathf.Ceil(timeLeft).ToString();
+
+            timeLeft -= Time.deltaTime;
+            yield return null;
+        }
+
+        if (countdownText != null)
+        {
+            countdownText.text = "KÖR!";
+            yield return new WaitForSeconds(0.5f);
+            countdownText.gameObject.SetActive(false);
+        }
+
+        currentTime = 0f;
+        isRunning = true;
+
+        if (uiManager != null)
+            uiManager.ShowGameUI();
+
+        if (simpleSpawner != null)
+            simpleSpawner.StartSpawning();
+    }
+}
+
+/*using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -50,4 +136,4 @@ public class TimeManager : MonoBehaviour
             SimpleSpawner.StartSpawning();
         }
     }
-}
+}*/

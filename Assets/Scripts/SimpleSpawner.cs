@@ -7,7 +7,7 @@ public class SimpleSpawner : MonoBehaviour
 
     [Header("Timing")]
     [SerializeField] private float spawnsPerSecond = 1.5f;
-    [SerializeField] private bool autoStart = true;
+    [SerializeField] private bool autoStart = false;
 
     private float timer;
     private bool running;
@@ -23,7 +23,7 @@ public class SimpleSpawner : MonoBehaviour
     {
         running = true;
         timer = 0f;
-        UIManager.ShowStartScreen();
+        //UIManager.ShowStartScreen();
     }
 
     public void StopSpawning()

@@ -42,7 +42,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-  
+
     }
 
     // =========================================================
@@ -53,10 +53,22 @@ public class UIManager : MonoBehaviour
     public void ShowStartScreen()
     {
 
-        timer.OnTimeUpdated += UpdateTimerUI;
+        /*timer.OnTimeUpdated += UpdateTimerUI;
         timer.OnTimeUp += ShowTimeUp;
 
         if (startTxt != null) startTxt.SetActive(false);
+        if (gameOverTxt != null) gameOverTxt.SetActive(false);
+        SetGameUIVisible(false); */
+
+        //Nykod
+
+        timer.OnTimeUpdated -= UpdateTimerUI;
+        timer.OnTimeUpdated += UpdateTimerUI;
+
+        timer.OnTimeUp -= ShowTimeUp;
+        timer.OnTimeUp += ShowTimeUp;
+
+        if (startTxt != null) startTxt.SetActive(true);
         if (gameOverTxt != null) gameOverTxt.SetActive(false);
         SetGameUIVisible(false);
     }
