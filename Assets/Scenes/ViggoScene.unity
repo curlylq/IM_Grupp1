@@ -1385,8 +1385,8 @@ MonoBehaviour:
   endTime: 90
   countdownStart: 3
   countdownText: {fileID: 2018734918}
-  simpleSpawner: {fileID: 0}
-  uiManager: {fileID: 0}
+  simpleSpawner: {fileID: 230127771}
+  uiManager: {fileID: 691698226}
 --- !u!4 &868772510
 Transform:
   m_ObjectHideFlags: 0
