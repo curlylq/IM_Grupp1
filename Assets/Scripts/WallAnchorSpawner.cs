@@ -24,6 +24,10 @@ public class WallAnchorSpawner : MonoBehaviour
     [Header("Behavior")]
     [SerializeField] private bool anchorOnce = true;
 
+    [Header("StartTimer")]
+    public UIManager UIManager;
+    public TimeManager TimeManager;
+
     private bool anchored;
 
     private void Awake()
@@ -81,7 +85,9 @@ public class WallAnchorSpawner : MonoBehaviour
         var simpleSpawner = spawnerRoot.GetComponentInChildren<SimpleSpawner>(true);
         if (simpleSpawner != null)
         {
-            simpleSpawner.StartSpawning();
+            
+            TimeManager.countDown();
+            
             Debug.Log("[WallAnchorSpawner] Started SimpleSpawner.");
         }
         else

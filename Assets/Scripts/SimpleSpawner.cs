@@ -12,6 +12,8 @@ public class SimpleSpawner : MonoBehaviour
     private float timer;
     private bool running;
 
+    public UIManager UIManager;
+
     private void Start()
     {
         if (autoStart) StartSpawning();
@@ -21,6 +23,7 @@ public class SimpleSpawner : MonoBehaviour
     {
         running = true;
         timer = 0f;
+        UIManager.ShowStartScreen();
     }
 
     public void StopSpawning()

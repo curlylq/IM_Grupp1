@@ -17,7 +17,7 @@ public class UITester : MonoBehaviour
             UIManager.Instance?.UpdateScore(999);
 
         if (Input.GetKeyDown(KeyCode.Alpha5))
-            UIManager.Instance?.UpdateTimer(8f); // testar röd timer
+            UIManager.Instance?.UpdateTimerUI(8f); // testar röd timer
 
         if (Input.GetKeyDown(KeyCode.Alpha6))
             UIManager.Instance?.UpdateRecipe("Köttbullar");

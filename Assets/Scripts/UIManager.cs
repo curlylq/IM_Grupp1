@@ -15,13 +15,17 @@ public class UIManager : MonoBehaviour
     [Header("Texter")]
     public TMP_Text scoreTxt;
     public TMP_Text recipeTxt;
+
+    [Header("Timer")]
     public TMP_Text timerTxt;
+    public TimeManager timer;
 
     [Header("Bild")]
     public UnityEngine.UI.Image recipeImg;
 
     [Header("Skärmar")]
     public GameObject startTxt;
+    public TMP_Text startCountdown;
     public GameObject gameOverTxt;
 
     // =========================================================
@@ -38,7 +42,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-       // ShowStartScreen();
+  
     }
 
     // =========================================================
@@ -48,7 +52,11 @@ public class UIManager : MonoBehaviour
     /// <summary>Visar startskärmen innan spelet börjar.</summary>
     public void ShowStartScreen()
     {
-        if (startTxt != null) startTxt.SetActive(true);
+
+        timer.OnTimeUpdated += UpdateTimerUI;
+        timer.OnTimeUp += ShowTimeUp;
+
+        if (startTxt != null) startTxt.SetActive(false);
         if (gameOverTxt != null) gameOverTxt.SetActive(false);
         SetGameUIVisible(false);
     }
@@ -102,13 +110,18 @@ public class UIManager : MonoBehaviour
     /// <summary>
     /// Uppdaterar timertexten. Blinkar rött under 10 sekunder.
     /// </summary>
-    public void UpdateTimer(float secondsLeft)
+    public void UpdateTimerUI(float time)
     {
-        if (timerTxt == null) return;
+        int minutes = Mathf.FloorToInt(time / 60f);
+        int seconds = Mathf.FloorToInt(time % 60f);
 
-        int display = Mathf.CeilToInt(secondsLeft);
-        timerTxt.text = "Tid: " + display + "s";
-        timerTxt.color = secondsLeft <= 10f ? Color.red : Color.white;
+        timerTxt.text = $"{minutes}:{seconds}";
+        
+    }
+
+    void ShowTimeUp()
+    {
+        timerTxt.text = "Time's up!";
     }
 
     /// <summary>

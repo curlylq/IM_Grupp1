@@ -8,6 +8,7 @@ public class HealthManager : MonoBehaviour
     public Image Heart_3;
 
     private int currentHearts;
+    public UIManager UIManager;
 
     void Start()
     {
@@ -24,6 +25,7 @@ public class HealthManager : MonoBehaviour
 
         if(currentHearts == 0)
         {
+            UIManager.ShowGameOver();
             currentHearts = 3;
             Invoke("UpdateHeartsUI", 2);
         }
