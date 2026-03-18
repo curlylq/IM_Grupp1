@@ -1,5 +1,4 @@
 using ExtralityLab;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -12,55 +11,59 @@ public class PanTrackedImageFollower : MonoBehaviour
     [Header("MQTT")]
     [SerializeField] private MqttClientExampleBidirectional mqttClient;
 
-    [Header("If you have multiple markers, set the name to follow (optional)")]
-    public string referenceImageName = "PanMarker";
+    [Header("Marker")]
+    [SerializeField] private string referenceImageName = "PanMarker";
 
-    [Header("Alignment offsets (tune these to match the real pan)")]
-    public Vector3 positionOffsetMeters = Vector3.zero;
-    public Vector3 rotationOffsetEuler = Vector3.zero;
+    [Header("Alignment offsets")]
+    [SerializeField] private Vector3 positionOffsetMeters = Vector3.zero;
+    [SerializeField] private Vector3 rotationOffsetEuler = Vector3.zero;
 
-    [Header("Smoothing")]
-    [Range(0f, 30f)] public float positionLerp = 20f;
-    [Range(0f, 30f)] public float rotationLerp = 20f;
+    [Header("Follow smoothing")]
+    [Range(1f, 40f)][SerializeField] private float positionLerp = 18f;
+    [Range(1f, 40f)][SerializeField] private float rotationLerp = 18f;
+
+    [Header("Lost tracking handling")]
+    [SerializeField] private float lostTrackingGraceTime = 0.2f;
+    [SerializeField] private float maxPredictionTime = 0.35f;
+    [SerializeField] private float predictionDamping = 6f;
+    [SerializeField] private float teleportDistance = 0.35f;
 
     [Header("Debug")]
     [SerializeField] private bool verboseLogs = false;
 
-    private bool hasTarget;
-    private bool ledIsOn = false;
-    private bool hasCalled = false;
-
-    private Vector3 targetPos;
-    private Quaternion targetRot;
-
-    private bool lastAnyTracking = false;
     private Rigidbody panRb;
+
+    private bool hasPose;
+    private bool currentlyTracked;
+    private bool ledIsOn;
+
+    private Vector3 desiredPos;
+    private Quaternion desiredRot;
+
+    private Vector3 predictedVelocity;
+    private Vector3 lastTrackedPos;
+    private Quaternion lastTrackedRot;
+    private bool hasPreviousTrackedPose;
+
+    private float lastSeenTime;
+    private float lostTimer;
 
     private void Awake()
     {
         if (trackedImageManager == null)
-            trackedImageManager = Object.FindFirstObjectByType<ARTrackedImageManager>();
+            trackedImageManager = FindFirstObjectByType<ARTrackedImageManager>();
 
         if (panProxy != null)
         {
             panRb = panProxy.GetComponent<Rigidbody>();
             if (panRb == null)
             {
-                Debug.LogError("[PanTrackedImageFollower] PanProxy has no Rigidbody. Add one and set it Kinematic.");
+                Debug.LogError("[PanTrackedImageFollower] PanProxy needs a Rigidbody.");
             }
-            else
+            else if (!panRb.isKinematic)
             {
-                if (!panRb.isKinematic)
-                    Debug.LogWarning("[PanTrackedImageFollower] PanProxy Rigidbody should be Kinematic for MovePosition/MoveRotation.");
+                Debug.LogWarning("[PanTrackedImageFollower] PanProxy Rigidbody should be Kinematic.");
             }
-        }
-
-        if (verboseLogs)
-        {
-            Debug.Log($"[PanTrackedImageFollower] trackedImageManager: {(trackedImageManager != null)}");
-            Debug.Log($"[PanTrackedImageFollower] mqttClient: {(mqttClient != null)}");
-            Debug.Log($"[PanTrackedImageFollower] referenceImageName: '{referenceImageName}'");
-            Debug.Log($"[PanTrackedImageFollower] panProxy: {(panProxy != null)} rb: {(panRb != null)}");
         }
     }
 
@@ -68,59 +71,91 @@ public class PanTrackedImageFollower : MonoBehaviour
     {
         if (trackedImageManager == null)
         {
-            Debug.LogError("[PanTrackedImageFollower] trackedImageManager is NULL. Cannot track images.");
+            Debug.LogError("[PanTrackedImageFollower] Missing ARTrackedImageManager.");
+            enabled = false;
             return;
         }
 
         trackedImageManager.trackablesChanged.AddListener(OnTrackedImagesChanged);
-
-        if (verboseLogs)
-            Debug.Log("[PanTrackedImageFollower] Subscribed to trackablesChanged.");
     }
 
     private void OnDisable()
     {
         if (trackedImageManager != null)
             trackedImageManager.trackablesChanged.RemoveListener(OnTrackedImagesChanged);
+    }
+
+    private void OnTrackedImagesChanged(ARTrackablesChangedEventArgs<ARTrackedImage> args)
+    {
+        bool foundTrackedPoseThisEvent = false;
+
+        foreach (var img in args.added)
+        {
+            if (TryConsumeImagePose(img))
+                foundTrackedPoseThisEvent = true;
+        }
+
+        foreach (var img in args.updated)
+        {
+            if (TryConsumeImagePose(img))
+                foundTrackedPoseThisEvent = true;
+        }
+
+        currentlyTracked = AnyMatchingImageTracked();
+
+        UpdateLed(currentlyTracked);
+
+        if (!currentlyTracked && verboseLogs)
+            Debug.Log("[PanTrackedImageFollower] Marker not currently tracked.");
+    }
+
+    private bool TryConsumeImagePose(ARTrackedImage img)
+    {
+        if (img == null)
+            return false;
+
+        if (!string.IsNullOrEmpty(referenceImageName) &&
+            img.referenceImage.name != referenceImageName)
+            return false;
+
+        // Testa gärna != None först. Vissa devices ger användbar pose även i Limited.
+        if (img.trackingState == TrackingState.None)
+            return false;
+
+        Pose rawPose = new Pose(img.transform.position, img.transform.rotation);
+        Quaternion rotOffset = Quaternion.Euler(rotationOffsetEuler);
+
+        Vector3 newPos = rawPose.position + rawPose.rotation * positionOffsetMeters;
+        Quaternion newRot = rawPose.rotation * rotOffset;
+
+        float now = Time.time;
+
+        if (hasPreviousTrackedPose)
+        {
+            float dt = Mathf.Max(0.0001f, now - lastSeenTime);
+            predictedVelocity = (newPos - lastTrackedPos) / dt;
+        }
+
+        lastTrackedPos = newPos;
+        lastTrackedRot = newRot;
+        lastSeenTime = now;
+        lostTimer = 0f;
+        hasPreviousTrackedPose = true;
+        hasPose = true;
+
+        desiredPos = newPos;
+        desiredRot = newRot;
 
         if (verboseLogs)
-            Debug.Log("[PanTrackedImageFollower] Unsubscribed from trackablesChanged.");
+            Debug.Log($"[PanTrackedImageFollower] Tracking pose from {img.referenceImage.name} at {newPos}");
+
+        return true;
     }
 
-    private void OnTrackedImagesChanged(UnityEngine.XR.ARFoundation.ARTrackablesChangedEventArgs<ARTrackedImage> args)
+    private bool AnyMatchingImageTracked()
     {
-        // Update follow target pose when image is TRACKING
-        foreach (var img in args.added) UpdatePoseIfMatch(img);
-        foreach (var img in args.updated) UpdatePoseIfMatch(img);
-
-        // Decide LED state based on whether ANY matching image is currently TRACKING
-        bool anyTracking = AnyMatchingImageTracking();
-
-        if (anyTracking != lastAnyTracking && verboseLogs)
-            Debug.Log($"[PanTrackedImageFollower] anyTracking changed -> {anyTracking}");
-
-        lastAnyTracking = anyTracking;
-
-        // MQTT is optional; don't block tracking if it's missing
-        if (mqttClient == null) //|| !mqttClient.IsConnected)
-            return;
-
-        // Publish only on state change
-        if (anyTracking && !ledIsOn)
-        {
-            mqttClient.PublishTopicValue("true");
-            ledIsOn = true;
-        }
-        else if (!anyTracking && ledIsOn)
-        {
-            mqttClient.PublishTopicValue("false");
-            ledIsOn = false;
-        }
-    }
-
-    private bool AnyMatchingImageTracking()
-    {
-        if (trackedImageManager == null) return false;
+        if (trackedImageManager == null)
+            return false;
 
         foreach (var tracked in trackedImageManager.trackables)
         {
@@ -128,52 +163,69 @@ public class PanTrackedImageFollower : MonoBehaviour
                 tracked.referenceImage.name != referenceImageName)
                 continue;
 
-            if (tracked.trackingState == TrackingState.Tracking)
+            if (tracked.trackingState != TrackingState.None)
                 return true;
         }
+
         return false;
     }
 
-    private void UpdatePoseIfMatch(ARTrackedImage img)
+    private void Update()
     {
-        if (img == null) return;
-
-        if (!string.IsNullOrEmpty(referenceImageName) &&
-            img.referenceImage.name != referenceImageName)
+        if (!hasPose)
             return;
 
-        if (img.trackingState != TrackingState.Tracking)
-            return;
-
-        // Optional one-time call when first found
-        if (!hasCalled && mqttClient != null )//&& mqttClient.IsConnected)
+        if (!currentlyTracked)
         {
-            mqttClient.PublishTopicValue("true");
-            hasCalled = true;
+            lostTimer += Time.deltaTime;
+
+            // Håll senaste pose en kort stund
+            if (lostTimer <= lostTrackingGraceTime)
+            {
+                desiredPos = lastTrackedPos;
+                desiredRot = lastTrackedRot;
+                return;
+            }
+
+            // Enkel prediktion en kort stund istället för att frysa direkt
+            float predictTime = Mathf.Min(lostTimer - lostTrackingGraceTime, maxPredictionTime);
+            if (predictTime > 0f)
+            {
+                float damping = Mathf.Exp(-predictionDamping * predictTime);
+                Vector3 v = predictedVelocity * damping;
+
+                desiredPos = lastTrackedPos + v * predictTime;
+                desiredRot = lastTrackedRot;
+            }
         }
-
-        Pose markerPose = new Pose(img.transform.position, img.transform.rotation);
-        Quaternion rotOffset = Quaternion.Euler(rotationOffsetEuler);
-
-        targetPos = markerPose.position + markerPose.rotation * positionOffsetMeters;
-        targetRot = markerPose.rotation * rotOffset;
-
-        hasTarget = true;
-
-        if (verboseLogs)
-            Debug.Log($"[PanTrackedImageFollower] Target updated from '{img.referenceImage.name}' pos:{targetPos} rot:{targetRot.eulerAngles}");
     }
 
     private void FixedUpdate()
     {
-        if (!hasTarget || panProxy == null) return;
+        if (!hasPose || panProxy == null)
+            return;
 
-        // Smooth toward target in physics time-step
         float dt = Time.fixedDeltaTime;
-        Vector3 newPos = Vector3.Lerp(panProxy.position, targetPos, dt * positionLerp);
-        Quaternion newRot = Quaternion.Slerp(panProxy.rotation, targetRot, dt * rotationLerp);
 
-        // Move through physics so rigidbodies ride the pan
+        // Om tracking hoppar långt vid återfångst, teleportera istället för att släpa efter
+        float dist = Vector3.Distance(panProxy.position, desiredPos);
+        if (dist > teleportDistance)
+        {
+            if (panRb != null)
+            {
+                panRb.position = desiredPos;
+                panRb.rotation = desiredRot;
+            }
+            else
+            {
+                panProxy.SetPositionAndRotation(desiredPos, desiredRot);
+            }
+            return;
+        }
+
+        Vector3 newPos = Vector3.Lerp(panProxy.position, desiredPos, dt * positionLerp);
+        Quaternion newRot = Quaternion.Slerp(panProxy.rotation, desiredRot, dt * rotationLerp);
+
         if (panRb != null)
         {
             panRb.MovePosition(newPos);
@@ -181,105 +233,24 @@ public class PanTrackedImageFollower : MonoBehaviour
         }
         else
         {
-            // Fallback: still works visually, but physics will be worse
             panProxy.SetPositionAndRotation(newPos, newRot);
         }
     }
-}
 
-
-
-/*using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARSubsystems;
-using ExtralityLab; // LÄGG TILL
-
-
-public class PanTrackedImageFollower : MonoBehaviour
-{
-    [SerializeField] private ARTrackedImageManager trackedImageManager;
-    [SerializeField] private Transform panProxy;
-
-    [Header("MQTT")] // LÄGG TILL
-    [SerializeField] private MqttClientExampleBidirectional mqttClient; // LÄGG TILL
-
-    [Header("If you have multiple markers, set the name to follow (optional)")]
-    public string referenceImageName = "";
-    [Header("Alignment offsets (tune these to match the real pan)")]
-    public Vector3 positionOffsetMeters = Vector3.zero;
-    public Vector3 rotationOffsetEuler = Vector3.zero;
-    [Header("Smoothing")]
-    [Range(0f, 30f)] public float positionLerp = 20f;
-    [Range(0f, 30f)] public float rotationLerp = 20f;
-
-    private bool hasTarget;
-    private bool ledIsOn = false; // LÄGG TILL
-    private Vector3 targetPos;
-    private Quaternion targetRot;
-
-    private void OnEnable()
+    private void UpdateLed(bool isTrackingNow)
     {
-        if (trackedImageManager == null)
-            trackedImageManager = FindObjectOfType<ARTrackedImageManager>();
-        trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
-    }
-
-    private void OnDisable()
-    {
-        trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
-    }
-
-    private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
-    {
-        foreach (var img in args.added) TryUpdateTarget(img);
-        foreach (var img in args.updated) TryUpdateTarget(img);
-
-        // LÄGG TILL - släck LED om imagen försvinner
-        foreach (var img in args.removed)
-        {
-            if (ledIsOn)
-            {
-                mqttClient?.PublishTopicValue("false");
-                ledIsOn = false;
-            }
-        }
-    }
-
-    private void TryUpdateTarget(ARTrackedImage img)
-    {
-        if (img.trackingState == TrackingState.None)
-        {
-            if (ledIsOn)
-            {
-                mqttClient?.PublishTopicValue("false");
-                ledIsOn = false;
-            }
+        if (mqttClient == null)
             return;
-        }
 
-        if (!string.IsNullOrEmpty(referenceImageName) &&
-            img.referenceImage.name != referenceImageName) return;
-
-        if (!ledIsOn)
+        if (isTrackingNow && !ledIsOn)
         {
-            mqttClient?.PublishTopicValue("true");
+            mqttClient.PublishTopicValue("true");
             ledIsOn = true;
         }
-
-        Pose markerPose = new Pose(img.transform.position, img.transform.rotation);
-        Quaternion rotOffset = Quaternion.Euler(rotationOffsetEuler);
-        Vector3 pos = markerPose.position + markerPose.rotation * positionOffsetMeters;
-        Quaternion rot = markerPose.rotation * rotOffset;
-        targetPos = pos;
-        targetRot = rot;
-        hasTarget = true;
+        else if (!isTrackingNow && ledIsOn)
+        {
+            mqttClient.PublishTopicValue("false");
+            ledIsOn = false;
+        }
     }
-
-    private void Update()
-    {
-        if (!hasTarget || panProxy == null) return;
-        panProxy.position = Vector3.Lerp(panProxy.position, targetPos, Time.deltaTime * positionLerp);
-        panProxy.rotation = Quaternion.Slerp(panProxy.rotation, targetRot, Time.deltaTime * rotationLerp);
-    }
-}*/
+}
