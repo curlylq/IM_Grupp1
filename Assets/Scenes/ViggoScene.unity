@@ -2337,8 +2337,12 @@ MonoBehaviour:
   referenceImageName: PanMarker
   positionOffsetMeters: {x: 0, y: 0, z: 0}
   rotationOffsetEuler: {x: 0, y: 0, z: 0}
-  positionLerp: 20
-  rotationLerp: 20
+  positionLerp: 22
+  rotationLerp: 18
+  lostTrackingGraceTime: 0.12
+  maxPredictionTime: 0.18
+  predictionDamping: 8
+  teleportDistance: 0.2
   verboseLogs: 0
 --- !u!33 &1384280457
 MeshFilter:
@@ -2409,6 +2413,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aaec6032ffbd3446806cd47224e1ec6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PanMotion
+  smoothSpeed: 4
 --- !u!1 &1458283862
 GameObject:
   m_ObjectHideFlags: 0
